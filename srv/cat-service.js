@@ -16,4 +16,8 @@ module.exports = cds.service.impl(async function() {
         const name = req.user ? req.user.id : 'anonymous';
         return { name: name };
     });
+
+    this.on('isAuthorized', () => {
+        return true;
+    });
 });

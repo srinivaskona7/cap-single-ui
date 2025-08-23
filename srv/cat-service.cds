@@ -13,4 +13,7 @@ service CatalogService {
      */
     @requires: 'authenticated-user'
     function userInfo() returns { name : String; };
+
+    @requires: 'kymacapnodejsviewer'
+    function isAuthorized() returns Boolean;
 }
