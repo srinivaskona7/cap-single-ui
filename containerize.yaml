@@ -1,0 +1,23 @@
+_schema-version: '1.0'
+repository: docker.io/sriniv7654
+tag: 1.0.0
+before-all:
+  - npx cds build --production ## cds build  (db & srv)
+  - npm --prefix app/project1 install ## html5 npm
+  - npm --prefix app/project1 run build:kyma  ## html5 build for kyma
+  - mkdir -p app/html5-deployer/resources/project1 ## create html5-deployer resource folder
+  - cp app/project1/xs-app.json app/html5-deployer/resources/project1/xs-app.json ## copy xs-app.json to html5-deployer
+ ## copy approuter xs-app.json to html5-deployer
+modules:
+  - name: single-srv
+    build-parameters:
+      dockerfile: srv/Dockerfile
+  - name: single-approuter
+    build-parameters:
+      dockerfile: app/router/Dockerfile
+  - name: single-hana-deployer
+    build-parameters:
+      dockerfile: db/Dockerfile
+  - name: single-html5-deployer
+    build-parameters:
+      dockerfile: app/html5-deployer/Dockerfile
