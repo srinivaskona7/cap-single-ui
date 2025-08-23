@@ -2,4 +2,15 @@ using my.bookshop as my from '../db/schema';
 
 service CatalogService {
     @readonly entity Books as projection on my.Books;
+
+    annotate Books with @(restrict: [
+        { grant: 'READ', to: 'kymacapnodejsviewer' }
+    ]);
+
+    /**
+     * Defines the custom function to get user information.
+     * It returns a structure containing the user's name.
+     */
+    @requires: 'authenticated-user'
+    function userInfo() returns { name : String; };
 }

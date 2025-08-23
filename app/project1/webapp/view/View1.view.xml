@@ -2,5 +2,33 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m">
     <Page id="page" title="{i18n>title}">
+        <headerContent>
+            <Text text="Hello, {user>/email}"/>
+        </headerContent>
+        <content>
+            <Table id="booksTable"
+                items="{/Books}">
+                <columns>
+                    <Column>
+                        <Text text="ID" />
+                    </Column>
+                    <Column>
+                        <Text text="Title" />
+                    </Column>
+                    <Column>
+                        <Text text="Stock" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{ID}" />
+                            <Text text="{title}" />
+                            <Text text="{stock}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
     </Page>
 </mvc:View>

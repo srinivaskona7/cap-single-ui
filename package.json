@@ -24,6 +24,25 @@
   },
   "cds": {
     "requires": {
+      "[development]": {
+        "auth": {
+          "kind": "mocked",
+          "users": {
+            "alice": {
+              "password": "alice",
+              "roles": [
+                "kymacapnodejsviewer"
+              ]
+            },
+            "bob": {
+              "password": "bob",
+              "roles": [
+                "any_other_role"
+              ]
+            }
+          }
+        }
+      },
       "[production]": {
         "auth": "xsuaa",
         "db": "hana"
