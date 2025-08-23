@@ -3,10 +3,11 @@
     xmlns="sap.m">
     <Page id="page" title="{i18n>title}">
         <headerContent>
-            <Text text="Hello, {user>/email}"/>
+            <Title text="Hello, {user>/email}" level="H2" class="sapUiSmallMarginBegin" />
         </headerContent>
         <content>
             <Table id="booksTable"
+                width="50%"
                 items="{/Books}">
                 <columns>
                     <Column>

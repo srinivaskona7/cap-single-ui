@@ -1,2 +1,2 @@
-sap.ui.define(["sap/ui/core/mvc/Controller"],e=>{"use strict";return e.extend("project1.controller.View1",{onInit(){}})});
+sap.ui.define(["sap/ui/core/mvc/Controller","sap/ui/model/json/JSONModel"],(e,t)=>{"use strict";return e.extend("project1.controller.View1",{onInit(){const e=new t;this.getView().setModel(e,"user");const n=this.getOwnerComponent().getModel();const o=n.bindContext("/userInfo()");o.requestObject().then(t=>{e.setProperty("/email",t.name)})}})});
 //# sourceMappingURL=View1.controller.js.map
