@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=./values.schema.json
 
 global:
-  domain: c-663907f.kyma.ondemand.com
+  domain: c-35d9992.kyma.ondemand.com
   imagePullSecret:
     name: docker-registry
   image:
@@ -63,8 +63,8 @@ xsuaa:
     tenant-mode: dedicated
     oauth2-configuration:
       redirect-uris:
-        - https://single-approuter-default.c-663907f.kyma.ondemand.com/**
-        - https://single-approuter-default.c-663907f.kyma.ondemand.com/login/callback
+        - https://single-approuter-default.c-35d9992.kyma.ondemand.com/**
+        - https://single-approuter-default.c-35d9992.kyma.ondemand.com/login/callback
     xsappname: single-{{ .Release.Namespace }}
 hana-deployer:
   image:
