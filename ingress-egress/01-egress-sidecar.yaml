@@ -1,0 +1,18 @@
+# Cluster-wide Egress Policy - Deny All by Default
+# This Sidecar resource enforces REGISTRY_ONLY mode, blocking all external traffic
+# unless explicitly allowed via ServiceEntry resources.
+#
+# Apply: kubectl apply -f 01-egress-sidecar.yaml
+# Delete: kubectl delete -f 01-egress-sidecar.yaml
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: default-egress-policy
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/managed-by: cap-egress-config
+    app.kubernetes.io/part-of: istio-egress-control
+spec:
+  outboundTrafficPolicy:
+    mode: REGISTRY_ONLY

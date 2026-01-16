@@ -1,0 +1,29 @@
+# Global Ingress IP Allowlist
+# Restricts cluster ingress to specific IP addresses only
+#
+# Apply: kubectl apply -f 03-ingress-ip-allowlist.yaml
+# Delete: kubectl delete -f 03-ingress-ip-allowlist.yaml
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: global-ingress-ip-allowlist
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/managed-by: cap-ingress-config
+    app.kubernetes.io/part-of: istio-ingress-control
+spec:
+  selector:
+    matchLabels:
+      app: istio-ingressgateway
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            ipBlocks:
+              # ===========================================
+              # Allowed IP Addresses
+              # ===========================================
+              - 17.233.169.53/32      # User IPv4 (Apple network)
+              - 2a01:b740:13c6::1c7/128  # User IPv6
+              - 18.211.151.194/32     # AWS service IP (CI/CD or external service)

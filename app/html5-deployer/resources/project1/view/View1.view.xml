@@ -6,9 +6,9 @@
             <Title text="Hello, {user>/email}" level="H2" class="sapUiSmallMarginBegin" />
         </headerContent>
         <content>
+            <MessageStrip id="authMessage" text="You are not authorized to view this data. Please check your roles." type="Error" showIcon="true" class="sapUiSmallMarginBottom" visible="false" />
             <Table id="booksTable"
-                width="50%"
-                items="{/Books}">
+                width="50%">
                 <columns>
                     <Column>
                         <Text text="ID" />

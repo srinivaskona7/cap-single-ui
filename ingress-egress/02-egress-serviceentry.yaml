@@ -1,0 +1,48 @@
+# SAP BTP Services - Egress ServiceEntry
+# Allows egress to SAP BTP services required for CAP applications
+#
+# Apply: kubectl apply -f 02-egress-serviceentry.yaml
+# Delete: kubectl delete -f 02-egress-serviceentry.yaml
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: sap-btp-services
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/managed-by: cap-egress-config
+    app.kubernetes.io/part-of: sap-btp-integration
+spec:
+  hosts:
+    # ===========================================
+    # XSUAA / Authentication Services
+    # ===========================================
+    - trail-new-k73tmz93.authentication.us10.hana.ondemand.com  # Tenant-specific XSUAA
+    - api.authentication.us10.hana.ondemand.com                  # XSUAA API
+    - internal-xsuaa.authentication.us10.hana.ondemand.com       # Internal XSUAA
+    - authentication.us10.hana.ondemand.com                      # Base authentication
+    - accounts.sap.com                                           # SAP Universal Identity
+    
+    # ===========================================
+    # HANA Cloud Database
+    # ===========================================
+    - 145ac721-44e0-4b9f-b6b1-951ddc395db2.hna1.prod-us10.hanacloud.ondemand.com  # HANA Cloud instance
+    
+    # ===========================================
+    # Cloud Foundry Services
+    # ===========================================
+    - destination-configuration.cfapps.us10.hana.ondemand.com    # Destination Service
+    - html5-apps-repo-rt.cfapps.us10.hana.ondemand.com           # HTML5 App Repository Runtime
+    - "*.cfapps.us10.hana.ondemand.com"                          # All CF Apps (wildcard)
+    
+    # ===========================================
+    # Kyma Cluster Internal Services
+    # ===========================================
+    - "*.c-3f6e6b4.kyma.ondemand.com"                            # Kyma cluster services
+    
+  location: MESH_EXTERNAL
+  ports:
+    - number: 443
+      name: https
+      protocol: TLS
+  resolution: NONE
