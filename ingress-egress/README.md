@@ -73,7 +73,7 @@ kubectl get authorizationpolicy -n istio-system --kubeconfig=$KUBECONFIG
 | `destination-configuration.cfapps.us10.hana.ondemand.com`                    | Destination Service    |
 | `html5-apps-repo-rt.cfapps.us10.hana.ondemand.com`                           | HTML5 Repo Runtime     |
 | `*.cfapps.us10.hana.ondemand.com`                                            | All CF Apps            |
-| `*.c-3f6e6b4.kyma.ondemand.com`                                              | Kyma Cluster Services  |
+| `*.b1eb3b8.kyma.ondemand.com`                                              | Kyma Cluster Services  |
 
 ### Ingress Policy (IP Allowlist)
 

@@ -24,6 +24,7 @@ spec:
               # ===========================================
               # Allowed IP Addresses
               # ===========================================
-              - 17.233.169.53/32      # User IPv4 (Apple network)
+              - 17.233.169.53/32 
+              - 17.233.164.185/32     # User IPv4 (Apple network)
               - 2a01:b740:13c6::1c7/128  # User IPv6
               - 18.211.151.194/32     # AWS service IP (CI/CD or external service)

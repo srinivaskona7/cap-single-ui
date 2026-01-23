@@ -1,9 +1,9 @@
 {
-  "xsappname": "singleui-{{ .Release.Namespace }}",
+  "xsappname": "single-ui-{{ .Release.Namespace }}",
   "tenant-mode": "dedicated",
   "scopes": [
     {
-      "name": "$XSAPPNAME.kymacapnodejsviewer",
+      "name": "$XSAPPNAME.kymacapnodejsviewer1",
       "description": "Access Books data"
     }
   ],
@@ -12,28 +12,28 @@
 
   "authorities": [
     "$ACCEPT_GRANTED_AUTHORITIES",
-    "$XSAPPNAME.kymacapnodejsviewer"
+    "$XSAPPNAME.kymacapnodejsviewer1"
   ],
 
   "role-templates": [
     {
-      "name": "KymaCapNodeJsDemoRoleTemplate",
+      "name": "KymaCapNodeJsDemoRoleTemplate1",
       "description": "Role Template for accessing Books",
-      "scope-references": ["$XSAPPNAME.kymacapnodejsviewer"],
+      "scope-references": ["$XSAPPNAME.kymacapnodejsviewer1"],
       "attribute-references": []
     }
   ],
 
   "role-collections": [
     {
-      "name": "CAPNodeJsUserRC",
+      "name": "CAPNodeJsUserRC1",
       "description": "Role Collection for Kyma CAP Node.js App",
-      "role-template-references": ["$XSAPPNAME.KymaCapNodeJsDemoRoleTemplate"]
+      "role-template-references": ["$XSAPPNAME.KymaCapNodeJsDemoRoleTemplate1"]
     }
   ],
   "oauth2-configuration": {
     "redirect-uris": [
-      "https://singleui-approuter-sri.c-3f6e6b4.kyma.ondemand.com/**"
+      "https://single-ui-approuter-kyma-nodejs-demo.c-9d0a141.kyma.ondemand.com/**"
     ]
   }
 }

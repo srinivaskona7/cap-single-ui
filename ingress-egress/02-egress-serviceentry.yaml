@@ -38,7 +38,7 @@ spec:
     # ===========================================
     # Kyma Cluster Internal Services
     # ===========================================
-    - "*.c-3f6e6b4.kyma.ondemand.com"                            # Kyma cluster services
+    - "*.b1eb3b8.kyma.ondemand.com"                            # Kyma cluster services
     
   location: MESH_EXTERNAL
   ports:

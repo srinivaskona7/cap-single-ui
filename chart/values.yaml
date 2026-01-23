@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=./values.schema.json
 
 global:
-  domain: c-3f6e6b4.kyma.ondemand.com
+  domain: c-9d0a141.kyma.ondemand.com
   imagePullSecret:
     name: docker-registry
   image:
@@ -30,6 +30,8 @@ srv:
       path: /health
     readiness:
       path: /health
+  expose:
+    enabled: false    
   networkSecurity:
     allowNamespaceInternal: true  
 approuter:
@@ -63,27 +65,10 @@ xsuaa:
   servicePlanName: application
   parameters:
     tenant-mode: dedicated
-    xsappname: singleui-{{ .Release.Namespace }}
-    scopes:
-      - name: $XSAPPNAME.kymacapnodejsviewer
-        description: Access Books data
-    authorities:
-      - $ACCEPT_GRANTED_AUTHORITIES
-      - $XSAPPNAME.kymacapnodejsviewer
-    role-templates:
-      - name: KymaCapNodeJsDemoRoleTemplate
-        description: Role Template for accessing Books
-        scope-references:
-          - $XSAPPNAME.kymacapnodejsviewer
-    role-collections:
-      - name: CAPNodeJsUserRC
-        description: Role Collection for Kyma CAP Node.js App
-        role-template-references:
-          - $XSAPPNAME.KymaCapNodeJsDemoRoleTemplate
+    xsappname: single-ui-{{ .Release.Namespace }}
     oauth2-configuration:
       redirect-uris:
-        - https://singleui-approuter-sri.c-3f6e6b4.kyma.ondemand.com/**
-        - https://singleui-approuter-sri.c-3f6e6b4.kyma.ondemand.com/login/callback
+        - https://single-ui-approuter-kyma-nodejs-demo.c-9d0a141.kyma.ondemand.com/**
 hana-deployer:
   image:
     repository: single-hana-deployer
