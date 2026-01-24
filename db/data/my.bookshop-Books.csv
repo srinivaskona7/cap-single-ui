@@ -1,3 +1,6 @@
-ID,title,stock
-1,Wuthering Heights,100
-2,Jane Eyre,500
+ID;title;stock
+1;Wuthering Heights;100
+2;Jane Eyre;500
+3;The Great Gatsby;150
+4;Pride and Prejudice;200
+5;Moby Dick;50

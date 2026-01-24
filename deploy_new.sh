@@ -308,6 +308,11 @@ module_package_push() {
         log_info "Pushing $PACKAGE_FILE..."
         helm push "$PACKAGE_FILE" "$REGISTRY_URI"
         log_success "Chart pushed successfully!"
+        
+        # Cleanup
+        rm "$PACKAGE_FILE"
+        log_info "Cleaned up local package: $PACKAGE_FILE"
+        
         log_info "Verify command: helm show chart $REGISTRY_URI/single --version $CHART_VERSION"
     else
         log_error "Package file $PACKAGE_FILE failed to generate."
@@ -613,6 +618,11 @@ module_build_new_chart() {
         log_info "Pushing Chart $PACKAGE_FILE to $REGISTRY_URI..."
         helm push "$PACKAGE_FILE" "$REGISTRY_URI"
         log_success "Full Release Build Complete!"
+        
+        # Cleanup
+        rm "$PACKAGE_FILE"
+        log_info "Cleaned up local package: $PACKAGE_FILE"
+        
         log_info "Artifacts:"
         log_info "  - Images Tag: $IMAGE_TAG"
         log_info "  - Chart Ver : $CHART_VERSION"
