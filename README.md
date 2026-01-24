@@ -553,9 +553,20 @@ You can override default configuration (like image tags, replicas, or external h
 
 To pass the full `xs-security.json` dynamically (best for automation):
 
+To pass the full `xs-security.json` dynamically (best for automation):
+
 ```bash
-helm upgrade --install single oci://registry-1.docker.io/sriniv7654/single \
-  --version 1.0.0 \
-  --set-json "xsuaa.parameters=$(cat xs-security.json)" \
-  --values custom-values.yaml
+# Example: Deploy to 'srii' namespace using 'trail-less-size' version
+helm -n srii upgrade --install single-ui oci://registry-1.docker.io/sriniv7654/single \
+  --version 1.0.0-trail-less-size \
+  --kubeconfig /Users/sr20536224wipro.com/Documents/clusters/trail/admin-sa-token.yaml \
+  --set-json "xsuaa.parameters=$(cat xs-security.json)"
 ```
+
+### Available Versions
+
+Currently available chart versions in the registry:
+
+- `1.0.0-dev`
+- `1.0.0-trail`
+- `1.0.0-trail-less-size`

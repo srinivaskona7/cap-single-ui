@@ -1,12 +1,12 @@
 # yaml-language-server: $schema=./values.schema.json
 
 global:
-  domain: c-9d0a141.kyma.ondemand.com
+  domain: c-3f6e6b4.kyma.ondemand.com
   imagePullSecret:
     name: docker-registry
   image:
     registry: docker.io/sriniv7654
-    tag: latest
+    tag: 1.0.0-trail-less-size
 srv:
   bindings:
     auth:
@@ -20,11 +20,11 @@ srv:
   resources:
     limits:
       ephemeral-storage: 1G
-      memory: 500M
+      memory: 128M
     requests:
       ephemeral-storage: 1G
-      cpu: 500m
-      memory: 500M
+      cpu: 50m
+      memory: 128M
   health:
     liveness:
       path: /health
@@ -45,11 +45,11 @@ approuter:
   resources:
     limits:
       ephemeral-storage: 1G
-      memory: 500M
+      memory: 128M
     requests:
       ephemeral-storage: 1G
-      cpu: 500m
-      memory: 500M
+      cpu: 50m
+      memory: 128M
   health:
     liveness:
       path: /
@@ -68,7 +68,7 @@ xsuaa:
     xsappname: single-ui-{{ .Release.Namespace }}
     oauth2-configuration:
       redirect-uris:
-        - https://single-ui-approuter-kyma-nodejs-demo.c-9d0a141.kyma.ondemand.com/**
+        - https://single-ui-approuter-srii.c-3f6e6b4.kyma.ondemand.com/**
 hana-deployer:
   image:
     repository: single-hana-deployer
@@ -77,11 +77,11 @@ hana-deployer:
       serviceInstanceName: hana
   resources:
     limits:
-      cpu: 2000m
-      memory: 1G
+      cpu: 200m
+      memory: 256M
     requests:
-      cpu: 1000m
-      memory: 1G
+      cpu: 50m
+      memory: 256M
 hana:
   serviceOfferingName: hana
   servicePlanName: hdi-shared
@@ -111,11 +111,11 @@ html5-apps-deployer:
       serviceInstanceName: html5-apps-repo-host
   resources:
     limits:
-      cpu: 2000m
-      memory: 1G
+      cpu: 200m
+      memory: 256M
     requests:
-      cpu: 1000m
-      memory: 1G
+      cpu: 50m
+      memory: 256M
   envFrom:
     - configMapRef:
         name: "{{ .Release.Name }}-html5-apps-deployer-configmap"

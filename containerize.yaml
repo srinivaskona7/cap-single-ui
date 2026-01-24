@@ -1,13 +1,7 @@
 _schema-version: '1.0'
 repository: docker.io/sriniv7654
 tag: latest
-before-all:
-  - npx cds build --production ## cds build  (db & srv)
-  - npm --prefix app/project1 install ## html5 npm
-  - npm --prefix app/project1 run build:kyma  ## html5 build for kyma
-  - mkdir -p app/html5-deployer/resources/project1 ## create html5-deployer resource folder
-  - cp app/project1/xs-app.json app/html5-deployer/resources/project1/xs-app.json ## copy xs-app.json to html5-deployer
- ## copy approuter xs-app.json to html5-deployer
+
 modules:
   - name: single-srv
     build-parameters:

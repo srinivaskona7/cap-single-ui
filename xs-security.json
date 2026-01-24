@@ -33,7 +33,7 @@
   ],
   "oauth2-configuration": {
     "redirect-uris": [
-      "https://single-ui-approuter-kyma-nodejs-demo.c-9d0a141.kyma.ondemand.com/**"
+      "https://single-ui-approuter-srii.c-3f6e6b4.kyma.ondemand.com/**"
     ]
   }
 }
