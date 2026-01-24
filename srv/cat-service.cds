@@ -1,13 +1,21 @@
 using my.bookshop as my from '../db/schema';
 
 service CatalogService {
-    @readonly
     entity Books as projection on my.Books;
 
-    annotate Books with @(restrict: [{
-        grant: 'READ',
-        to   : 'kymacapnodejsviewer1'
-    }]);
+    annotate Books with @(restrict: [
+        {
+            grant: 'READ',
+            to   : 'kymacapnodejsviewer1'
+        },
+        {
+            grant: [
+                'READ',
+                'WRITE'
+            ],
+            to   : 'Admin'
+        }
+    ]);
 
     /**
      * Defines the custom function to get user information.

@@ -8,24 +8,46 @@
         <content>
             <MessageStrip id="authMessage" text="You are not authorized to view this data. Please check your roles." type="Error" showIcon="true" class="sapUiSmallMarginBottom" visible="false" />
             <Table id="booksTable"
-                width="50%">
+                width="auto"
+                class="sapUiSmallMargin"
+                growing="true"
+                growingThreshold="20"
+                sticky="ColumnHeaders,HeaderToolbar"
+                inset="false"
+                mode="Delete"
+                delete="onDeleteBook"
+                alternateRowColors="true">
+                
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="Books Inventory" level="H2"/>
+                        <ToolbarSpacer/>
+                        <SearchField width="20%" placeholder="Search Books" search=".onSearchBook"/>
+                        <Button icon="sap-icon://add" text="Add Book" type="Emphasized" press=".onAddBook"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+                
                 <columns>
-                    <Column>
+                    <Column width="5em">
                         <Text text="ID" />
                     </Column>
                     <Column>
                         <Text text="Title" />
                     </Column>
-                    <Column>
+                    <Column hAlign="End">
                         <Text text="Stock" />
+                    </Column>
+                    <Column width="4em">
+                         <!-- Action Column -->
                     </Column>
                 </columns>
                 <items>
-                    <ColumnListItem>
+                    <ColumnListItem type="Inactive">
                         <cells>
-                            <Text text="{ID}" />
+                            <ObjectIdentifier title="{ID}"/>
                             <Text text="{title}" />
-                            <Text text="{stock}" />
+                            <ObjectNumber number="{stock}" state="{= ${stock} > 10 ? 'Success' : 'Error' }" />
+                            <Button icon="sap-icon://delete" type="Transparent" press=".onDeleteBookButton"/>
                         </cells>
                     </ColumnListItem>
                 </items>

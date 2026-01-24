@@ -5,6 +5,10 @@
     {
       "name": "$XSAPPNAME.kymacapnodejsviewer1",
       "description": "Access Books data"
+    },
+    {
+      "name": "$XSAPPNAME.Admin",
+      "description": "Admin access for Books"
     }
   ],
 
@@ -12,7 +16,8 @@
 
   "authorities": [
     "$ACCEPT_GRANTED_AUTHORITIES",
-    "$XSAPPNAME.kymacapnodejsviewer1"
+    "$XSAPPNAME.kymacapnodejsviewer1",
+    "$XSAPPNAME.Admin"
   ],
 
   "role-templates": [
@@ -20,6 +25,12 @@
       "name": "KymaCapNodeJsDemoRoleTemplate1",
       "description": "Role Template for accessing Books",
       "scope-references": ["$XSAPPNAME.kymacapnodejsviewer1"],
+      "attribute-references": []
+    },
+    {
+      "name": "AdminRoleTemplate",
+      "description": "Admin Role Template for Books",
+      "scope-references": ["$XSAPPNAME.Admin"],
       "attribute-references": []
     }
   ],
@@ -29,6 +40,11 @@
       "name": "CAPNodeJsUserRC1",
       "description": "Role Collection for Kyma CAP Node.js App",
       "role-template-references": ["$XSAPPNAME.KymaCapNodeJsDemoRoleTemplate1"]
+    },
+    {
+      "name": "CAPNodeJsAdminRC",
+      "description": "Admin Role Collection",
+      "role-template-references": ["$XSAPPNAME.AdminRoleTemplate"]
     }
   ],
   "oauth2-configuration": {

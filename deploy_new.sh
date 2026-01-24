@@ -389,6 +389,15 @@ execute_build_cycle() {
         log_info "Updated tag to '$IMAGE_TAG' in $VALUES_FILE"
     fi
     
+    # UI5 Build Step (Crucial for UI changes)
+    if [ -d "app/project1" ]; then
+        log_info "Building UI5 Project (project1)..."
+        (cd app/project1 && npm run build:kyma) || {
+            log_error "UI5 Build failed."
+            exit 1
+        }
+    fi
+    
     log_info "Building project artifacts (CDS)..."
     npx cds build --production
 }
@@ -559,14 +568,19 @@ module_build_new_chart() {
     fi
 
     # 1. Gather Inputs
-    read -p "Enter Image Tag (e.g., 1.0.0-rc1): " INPUT_TAG
-    IMAGE_TAG=${INPUT_TAG:-latest}
-    
-    read -p "Enter Chart Version (e.g., 1.0.0-rc1): " CHART_VERSION
-    if [ -z "$CHART_VERSION" ]; then
-        log_error "Chart Version is required."
+    # Default prefix 1.0.0-
+    read -p "Enter Version Suffix (for 1.0.0-): " TAG_SUFFIX
+    if [ -z "$TAG_SUFFIX" ]; then
+        log_error "Suffix is required (e.g., ui1)."
         exit 1
     fi
+    
+    IMAGE_TAG="1.0.0-$TAG_SUFFIX"
+    CHART_VERSION="$IMAGE_TAG"
+    
+    log_info "Configuration:"
+    log_info "  - Image Tag    : $IMAGE_TAG"
+    log_info "  - Chart Version: $CHART_VERSION"
     
     # 2. Update Configuration & Build CDS
     echo ""
@@ -575,6 +589,16 @@ module_build_new_chart() {
         sed -i '' "s/tag: .*/tag: $IMAGE_TAG/g" "$VALUES_FILE"
         log_info "Updated tag to '$IMAGE_TAG' in $VALUES_FILE"
     fi
+    
+    # UI5 Build Step
+    if [ -d "app/project1" ]; then
+        log_info "Building UI5 Project (project1)..."
+        (cd app/project1 && npm run build:kyma) || {
+            log_error "UI5 Build failed."
+            exit 1
+        }
+    fi
+    
     log_info "Building project artifacts (CDS)..."
     npx cds build --production
 
@@ -699,8 +723,10 @@ module_deploy_from_oci() {
     read -p "Target Namespace [srii]: " TARGET_NAMESPACE
     TARGET_NAMESPACE=${TARGET_NAMESPACE:-srii}
     
-    echo "Enter Path to Kubeconfig File:"
+    DEFAULT_KUBECONFIG="/Users/sr20536224wipro.com/Documents/clusters/trail/admin-sa-token.yaml"
+    echo "Enter Path to Kubeconfig File (Default: $DEFAULT_KUBECONFIG):"
     read -e -p "Path > " CUSTOM_KUBECONFIG
+    CUSTOM_KUBECONFIG=${CUSTOM_KUBECONFIG:-$DEFAULT_KUBECONFIG}
     
     if [ -z "$CUSTOM_KUBECONFIG" ] || [ ! -f "$CUSTOM_KUBECONFIG" ]; then
         log_error "Valid Kubeconfig path is required."
