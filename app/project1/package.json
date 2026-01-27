@@ -15,6 +15,6 @@
   },
   "scripts": {
     "deploy-config": "npx -p @sap/ux-ui5-tooling fiori add deploy-config cf",
-    "build:kyma": "ui5 build --dest ../html5-deployer/resources/project1 --clean-dest true"
+    "build:kyma": "ui5 build --dest ../html5-deployer/resources/project1 --clean-dest true && cp webapp/xs-app.json ../html5-deployer/resources/project1/"
   }
 }

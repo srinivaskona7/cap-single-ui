@@ -6,6 +6,10 @@ WORKDIR /home/node/app
 # Copy source
 COPY app/html5-deployer/. ./
 
+# [PROFESSIONAL FIX] Explicitly copy the correct xs-app.json from source
+# This ensures we don't rely on potentially stale local build artifacts
+COPY app/project1/webapp/xs-app.json ./resources/project1/xs-app.json
+
 # Install dependencies from private registry
 RUN npm install --maxsockets 1
 
