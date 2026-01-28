@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # ==============================================================================
 # Configuration & Constants
@@ -14,6 +13,16 @@ DEV_DOMAIN="b1eb3b8.kyma.ondemand.com"
 DEV_KYMA_DOMAIN="b1eb3b8.kyma.ondemand.com"
 DEV_NAMESPACE="egress"
 DEV_KUBECONTEXT="appnewdev-b1eb3b8"
+
+UAT_DOMAIN="c-563c468.kyma.ondemand.com"
+UAT_KYMA_DOMAIN="c-563c468.kyma.ondemand.com"
+UAT_NAMESPACE="btp-platform-foundation"
+# UAT_KUBECONTEXT="" # Add if known
+
+TRAIL_DOMAIN="c-3f6e6b4.kyma.ondemand.com"
+TRAIL_KYMA_DOMAIN="c-3f6e6b4.kyma.ondemand.com"
+TRAIL_NAMESPACE="srii"
+# TRAIL_KUBECONTEXT="" # Add if known
 
 VALUES_FILE="chart/values.yaml"
 XS_SECURITY_FILE="xs-security.json"
@@ -72,7 +81,7 @@ check_prerequisites() {
     log_info "Checking prerequisites..."
     local missing=0
     
-    for tool in helm docker kubectl npx; do
+    for tool in helm docker kubectl npx ctz; do
         if ! command -v $tool &> /dev/null; then
             log_error "$tool is not installed or not in PATH."
             missing=$((missing+1))
@@ -122,10 +131,11 @@ get_user_action() {
     echo "  6) Optimize Resources (Minimal Profile) & Build"
     echo "  7) Build New Chart (Images + Helm OCI)"
     echo "  8) Deploy from OCI Registry (Helm Upgrade)"
+    echo "  9) Hana Enable (Manager)"
     echo ""
-    read -p "Enter choice [1-8]: " ACTION_CHOICE
+    read -p "Enter choice [1-9]: " ACTION_CHOICE
     
-    if [[ ! "$ACTION_CHOICE" =~ ^[1-8]$ ]]; then
+    if [[ ! "$ACTION_CHOICE" =~ ^[1-9]$ ]]; then
         log_error "Invalid selection."
         exit 1
     fi
@@ -136,9 +146,11 @@ configure_environment() {
     echo -e "${BOLD}Select Environment:${NC}"
     echo "  1) SBX (Domain: $SBX_DOMAIN | NS: $SBX_NAMESPACE)"
     echo "  2) DEV (Domain: $DEV_DOMAIN | NS: $DEV_NAMESPACE)"
-    echo "  3) Custom (Enter Details Manually)"
+    echo "  3) UAT (Domain: $UAT_DOMAIN | NS: $UAT_NAMESPACE)"
+    echo "  4) TRAIL (Domain: $TRAIL_DOMAIN | NS: $TRAIL_NAMESPACE)"
+    echo "  5) Custom (Enter Details Manually)"
     echo ""
-    read -p "Enter choice [1-3]: " ENV_CHOICE
+    read -p "Enter choice [1-5]: " ENV_CHOICE
 
     case $ENV_CHOICE in
         1)
@@ -158,6 +170,22 @@ configure_environment() {
             CUSTOM_KUBECONFIG=""
             ;;
         3)
+            ENV_NAME="uat"
+            TARGET_DOMAIN="$UAT_DOMAIN"
+            TARGET_KYMA_DOMAIN="$UAT_KYMA_DOMAIN"
+            TARGET_NAMESPACE="$UAT_NAMESPACE"
+            # TARGET_CONTEXT="$UAT_KUBECONTEXT"
+            CUSTOM_KUBECONFIG=""
+            ;;
+        4)
+            ENV_NAME="trail"
+            TARGET_DOMAIN="$TRAIL_DOMAIN"
+            TARGET_KYMA_DOMAIN="$TRAIL_KYMA_DOMAIN"
+            TARGET_NAMESPACE="$TRAIL_NAMESPACE"
+            # TARGET_CONTEXT="$TRAIL_KUBECONTEXT"
+            CUSTOM_KUBECONFIG=""
+            ;;
+        5)
             ENV_NAME="custom"
             echo ""
             # Only prompt for Domain/Kyma if NOT uninstalling (Action 2 only needs Kubeconfig/NS)
@@ -320,34 +348,30 @@ module_package_push() {
     fi
 }
 
-build_and_push_docker() {
-    local name=$1
-    local dockerfile=$2
-    local full_image="$REPO_PREFIX/$name:$IMAGE_TAG"
-    
-    echo -e "  ${CYAN}Processing: $name${NC}"
-    
-    if [ ! -f "$dockerfile" ]; then
-        log_error "Dockerfile '$dockerfile' not found. Skipping."
-        return 1
+execute_ctz_build() {
+    log_info "Executing Automated Build Logic using ctz..."
+
+    if [ ! -f "containerize.yaml" ]; then
+        log_error "containerize.yaml not found!"
+        exit 1
     fi
     
-    # Enforce linux/amd64 for Cloud Compatibility (SAP BTP/Kyma)
-    # This ensures images built on Mac M1/M2 (ARM) still run on standard x86 clusters.
-    echo "    - Building for linux/amd64 ($dockerfile)..."
+    # 1. Update Tag in containerize.yaml (ctz requirement)
+    # We use sed to replace the tag value dynamically
+    sed -i '' "s/tag: .*/tag: $IMAGE_TAG/" "containerize.yaml"
+    log_info "Updated tag in containerize.yaml to: $IMAGE_TAG"
     
-    # Using --platform linux/amd64
-    # Removed quiet flag -q and redirect >/dev/null for verbose output
-    if docker build --platform linux/amd64 -t "$full_image" -f "$dockerfile" .; then
-        echo "    - Pushing to registry..."
-        if docker push "$full_image" | grep -v "Layer already exists"; then
-            log_success "Pushed: $full_image"
-        else
-            log_error "Push failed for $full_image"
-            exit 1
-        fi
+    # 2. Enforce Platform via Env Var for Kyma compatibility
+    export DOCKER_DEFAULT_PLATFORM=linux/amd64
+    log_info "Enforcing Platform: $DOCKER_DEFAULT_PLATFORM"
+
+    # 3. Run ctz
+    # --push auto-pushes to registry
+    # --log shows output
+    if ctz containerize.yaml --push --log; then
+        log_success "Build & Push (via ctz) Complete!"
     else
-        log_error "Build failed for $name"
+        log_error "ctz build failed."
         exit 1
     fi
 }
@@ -356,24 +380,8 @@ prepare_docker_images() {
     # Use shared helper to Prompt Tag -> Update Values -> Build CDS
     execute_build_cycle
     
-    echo ""
-    echo -e "${CYAN}${BOLD}--- Docker Image Build & Push ---${NC}"
-    log_info "Using Tag: ${BOLD}$IMAGE_TAG${NC}"
-    
-    if [ -f "$CONTAINERIZE_FILE" ]; then
-        REPO_PREFIX=$(grep "repository:" "$CONTAINERIZE_FILE" | awk '{print $2}')
-    fi
-    
-    if [ -z "$REPO_PREFIX" ]; then
-        log_warn "Could not determine repository from $CONTAINERIZE_FILE. Using default 'docker.io/sriniv7654'."
-        REPO_PREFIX="docker.io/sriniv7654"
-    fi
-
-    # Configured modules from known containerize structure
-    build_and_push_docker "single-srv" "srv/Dockerfile"
-    build_and_push_docker "single-approuter" "app/router/Dockerfile"
-    build_and_push_docker "single-hana-deployer" "db/Dockerfile"
-    build_and_push_docker "single-html5-deployer" "app/html5-deployer/Dockerfile"
+    # [AUTOMATED BUILD]
+    execute_ctz_build
 }
 
 # Helper for Standard Build Cycle (Prompt -> Update -> Build)
@@ -602,18 +610,53 @@ module_build_new_chart() {
     log_info "Building project artifacts (CDS)..."
     npx cds build --production
 
+    # [FIX] Suppress "did not declare a repository" warnings
+    if [ -f "gen/chart/Chart.yaml" ]; then
+        log_info "Patching Chart.yaml to resolve local dependencies..."
+        # Add repository: file://./charts/<name> to each dependency
+        # We use a temporary node script for robust YAML editing
+        node -e '
+        const fs = require("fs");
+        try {
+            const yaml = require("js-yaml");
+            const chartPath = "gen/chart/Chart.yaml";
+            const doc = yaml.load(fs.readFileSync(chartPath, "utf8"));
+            if (doc.dependencies) {
+                doc.dependencies.forEach(dep => {
+                    if (!dep.repository && ["web-application", "service-instance", "content-deployment"].includes(dep.name)) {
+                        dep.repository = "file://./charts/" + dep.name;
+                    }
+                });
+                fs.writeFileSync(chartPath, yaml.dump(doc));
+                console.log("Chart.yaml patched successfully.");
+            }
+        } catch (e) {
+            console.warn("Failed to patch Chart.yaml: " + e.message);
+        }
+        '
+    fi
+
     # 3. Build & Push Docker Images
     echo ""
-    log_info "Step 2/3: Building & Pushing Docker Images..."
-    if [ -f "$CONTAINERIZE_FILE" ]; then
-        REPO_PREFIX=$(grep "repository:" "$CONTAINERIZE_FILE" | awk '{print $2}')
-    fi
-    [ -z "$REPO_PREFIX" ] && REPO_PREFIX="docker.io/sriniv7654"
+    # [AUTOMATED BUILD]
+    log_info "Executing Automated Build Logic..."
     
-    build_and_push_docker "single-srv" "srv/Dockerfile"
-    build_and_push_docker "single-approuter" "app/router/Dockerfile"
-    build_and_push_docker "single-hana-deployer" "db/Dockerfile"
-    build_and_push_docker "single-html5-deployer" "app/html5-deployer/Dockerfile"
+    # 1. Execute before-all hooks
+    node -e '
+      const fs = require("fs");
+      try { const yaml = require("js-yaml"); 
+      const doc = yaml.load(fs.readFileSync("containerize.yaml", "utf8"));
+      if (doc["before-all"]) doc["before-all"].forEach(c => console.log(c));
+      } catch(e) { process.exit(1); }
+    ' | while read -r cmd; do
+        if [ -n "$cmd" ]; then
+            log_info "Running: $cmd"
+            eval "$cmd" || { log_error "Failed: $cmd"; exit 1; }
+        fi
+    done
+
+    # 2. Build Modules
+    execute_ctz_build
     
     # 4. Package & Push Helm Chart
     echo ""
@@ -654,6 +697,20 @@ module_build_new_chart() {
         log_error "Chart packaging failed."
         exit 1
     fi
+}
+
+module_hana_enable() {
+    # Verify script exists
+    if [ ! -f "hana-manager.sh" ]; then
+        log_error "hana-manager.sh not found!"
+        exit 1
+    fi
+    
+    # Make executable just in case
+    chmod +x hana-manager.sh
+    
+    # Execute directly - it will takeover the interactive session
+    ./hana-manager.sh
 }
 
 module_deploy_from_oci() {
@@ -777,4 +834,5 @@ case $ACTION_CHOICE in
     6) module_optimize_resources ;;
     7) module_build_new_chart ;;
     8) module_deploy_from_oci ;;
+    9) module_hana_enable ;;
 esac

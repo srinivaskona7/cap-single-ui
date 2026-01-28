@@ -1,7 +1,12 @@
 _schema-version: '1.0'
 repository: docker.io/sriniv7654
-tag: latest
-
+tag: 1.0.0-sbx1
+before-all:
+  - npx cds build --production ## cds build  (db & srv)
+  - npm --prefix app/project1 install ## html5 npm
+  - npm --prefix app/project1 run build:kyma  ## html5 build for kyma
+  - mkdir -p app/html5-deployer/resources/project1 ## create html5-deployer resource folder
+  - cp app/project1/webapp/xs-app.json app/html5-deployer/resources/project1/xs-app.json ## cds build  (db & srv)
 modules:
   - name: single-srv
     build-parameters:

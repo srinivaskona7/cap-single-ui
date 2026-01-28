@@ -1,21 +1,22 @@
-FROM --platform=linux/amd64 node:20 AS build
+FROM node:20-alpine AS build
 
 # Use node's home dir as workspace
 WORKDIR /home/node/app
 
+# Install build dependencies
+# RUN apk add --no-cache python3 make g++
+
 # Copy source
 COPY app/html5-deployer/. ./
 
-# [PROFESSIONAL FIX] Explicitly copy the correct xs-app.json from source
-# This ensures we don't rely on potentially stale local build artifacts
-COPY app/project1/webapp/xs-app.json ./resources/project1/xs-app.json
+
 
 # Install dependencies from private registry
 RUN npm install --maxsockets 1
 
 
 # ---------- Runtime ----------
-FROM --platform=linux/amd64 node:20-slim
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /home/node/app

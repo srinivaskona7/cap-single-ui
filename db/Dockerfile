@@ -1,7 +1,10 @@
-FROM --platform=linux/amd64 node:20 AS build
+FROM node:20-alpine AS build
 
 # Use node's home dir as workspace
 WORKDIR /home/node/app
+
+# Install build dependencies
+#RUN apk add --no-cache python3 make g++
 
 # Copy source
 COPY gen/db ./
@@ -11,7 +14,7 @@ RUN npm install
 
 
 # ---------- Runtime ----------
-FROM --platform=linux/amd64 node:20-slim
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /home/node/app

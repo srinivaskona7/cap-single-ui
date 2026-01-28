@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CAP Deployment Center</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">
+          <span class="icon">🚀</span>
+          <h1>CAP Deployment Center</h1>
+        </div>
+        <div class="status">
+          <span class="indicator" id="status-indicator"></span>
+          <span id="status-text">Ready</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="controls">
+          <div class="card">
+            <h2>Configuration</h2>
+
+            <div class="form-group">
+              <label for="action-select">Action</label>
+              <select id="action-select">
+                <option value="build_images">Build & Push Images</option>
+                <option value="build_chart">Build New Chart (Release)</option>
+                <option value="deploy_oci">Deploy from OCI Registry</option>
+              </select>
+            </div>
+
+            <!-- Dynamic Inputs depending on Action -->
+            <div class="form-group" id="tag-group">
+              <label for="inp-tag">Image Tag / Suffix</label>
+              <input
+                type="text"
+                id="inp-tag"
+                placeholder="e.g., latest or ui1"
+              />
+              <small>For Build Chart, enter suffix only (e.g., 'ui1').</small>
+            </div>
+
+            <div class="form-group hidden" id="deploy-group">
+              <label for="chart-version">Chart Version</label>
+              <select id="chart-version">
+                <option value="">Loading versions...</option>
+              </select>
+              <br /><br />
+              <label for="inp-ns">Target Namespace</label>
+              <input type="text" id="inp-ns" value="srii" />
+            </div>
+
+            <button id="btn-execute" class="primary-btn">Execute</button>
+          </div>
+        </section>
+
+        <section class="terminal-view">
+          <div class="terminal-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="title">deploy_new.sh</span>
+          </div>
+          <div class="terminal-output" id="terminal">
+            <div class="line">Waiting for command...</div>
+          </div>
+          <!-- Interactive Input -->
+          <div class="terminal-input-area">
+            <span class="prompt">$</span>
+            <input type="text" id="terminal-input" placeholder="Type command here..." disabled autocomplete="off">
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

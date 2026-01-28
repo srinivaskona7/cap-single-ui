@@ -1,12 +1,12 @@
 # yaml-language-server: $schema=./values.schema.json
 
 global:
-  domain: c-3f6e6b4.kyma.ondemand.com
+  domain: c-9d0a141.kyma.ondemand.com
   imagePullSecret:
     name: docker-registry
   image:
     registry: docker.io/sriniv7654
-    tag: 1.0.0-ui-fix-3
+    tag: 1.0.0-sbx1
 srv:
   bindings:
     auth:
@@ -68,7 +68,7 @@ xsuaa:
     xsappname: single-ui-{{ .Release.Namespace }}
     oauth2-configuration:
       redirect-uris:
-        - https://single-ui-approuter-srii.c-3f6e6b4.kyma.ondemand.com/**
+        - https://single-ui-approuter-kyma-nodejs-demo.c-9d0a141.kyma.ondemand.com/**
 hana-deployer:
   image:
     repository: single-hana-deployer
